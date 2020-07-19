@@ -22,6 +22,7 @@ class Scara():
             self.increment_a = 0.001 * 2 * pi/self.speed_a
 
     def __f_kinematics(self):
+        """ Update transformation matrix """
         self.t01 = np.array([[cos(self.joint_a[0]), -1*sin(self.joint_a[0]), 0, cos(self.joint_a[0])*self.link_d[0]],
                              [sin(self.joint_a[0]),  1*cos(self.joint_a[0]), 0, sin(self.joint_a[0])*self.link_d[0]],
                              [0                   ,  0                     , 1, 0                                  ],
@@ -54,7 +55,7 @@ class Scara():
         self.__update_jointpos(self.t01, self.t02, self.t03)
 
     def __update_jointpos(self, t01, t02, t03):
-        """ Update keyposition data """
+        """ Update keyposition data, called after __f_kinematics """
         self.keypos = []
         self.keypos.append(np.array([0,0,0]))
         self.keypos.append(t01[0:3, 3])
@@ -66,12 +67,14 @@ class Scara():
         return self.keypos
     
     def set_velocity(self, id, time):
+        """ Update velocity of given id """
         self.speed_a[id] = time
-        self.increment_a = 0.001 * 2 * pi/time
+        self.increment_a[id] = 0.001 * 2 * pi/time
 
     def update_angle(self, direction):
+        """ Update all motor angle """
         self.joint_a = self.joint_a + self.increment_a * direction
-        print(self.joint_a)
 
     def update(self):
+        """ Update joint position and other parameter by forward kinematic """
         self.__f_kinematics()

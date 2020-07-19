@@ -32,7 +32,10 @@ if __name__ == "__main__":
         vel = np.dot(np.linalg.inv(J),np.array([-500,0,0]))
 
         # Update angular velocity
-        robot.increment_a = 0.001 * vel
+        new_time = 2*pi/vel
+        robot.set_velocity(0, new_time[0])
+        robot.set_velocity(1, new_time[1])
+        robot.set_velocity(2, new_time[2])
 
         # Update angle
         robot.update_angle(np.array([1 * clockwise, 1 * clockwise, 1 * clockwise]))
