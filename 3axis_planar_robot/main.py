@@ -3,17 +3,28 @@
 import arm
 import cv2
 import numpy as np
-from math import hypot, pi, sin, cos
+from math import hypot, pi, sin, cos, sqrt
+
+
+def cal_vel(_target, present, speed):
+    direct = _target - present
+    dir_len = sqrt(pow(direct[0], 2) + pow(direct[1], 2) + pow(direct[2], 2))
+    unit_dir = direct / dir_len
+    ans = unit_dir * speed
+    return ans
 
 if __name__ == "__main__":
     robot = arm.Scara()
     robot.update()
 
     center = np.array([320,320])
+    target = np.array([200, 200, 0])
+    end_effect = np.array([0,0,0])
     clockwise = 1
     cv2.namedWindow("test", cv2.WINDOW_NORMAL)
     counter = 0
     vel = 0
+    vel_j = 0
     while True:
         # Blank frame
         sim_frame = np.zeros((640,640,3))
@@ -30,9 +41,12 @@ if __name__ == "__main__":
                       [ 1*a0_c1+a1_c12+a2_c123,  1*a1_c12+a2_c123,  1*a2_c123],
                       [ 1                     ,  1                , 1]])
 
+        keypos = robot.get_keypos()
         # Velocity of end effector in this case is x:-500,y:0, theta: 0
-        if counter % 600 == 0:
-            vel = np.dot(np.linalg.inv(J),np.array([-500,0,0]))
+        if counter % 1 == 0:
+            vel_j = cal_vel(target, keypos[3], 500)
+            vel = np.dot(np.linalg.inv(J), vel_j)
+            # vel = np.dot(np.linalg.inv(J),np.array([-500,0,0]))
 
         counter = counter + 1
         # Update angular velocity
@@ -58,6 +72,10 @@ if __name__ == "__main__":
             joint_e = tuple(joint_e)
             cv2.line(sim_frame, joint_f, joint_e, (0, 255, 0), 5)
             cv2.circle(sim_frame, joint_f, 10, (0, 0, 255), -1)
+        
+        #end_effect = keypos[3][0:2]*[1, -1] + center
+        #end_effect = np.append(end_effect, [0])
+        print(keypos[3])
         cv2.imshow("test", sim_frame)
         key = cv2.waitKey(1)
 
@@ -66,3 +84,4 @@ if __name__ == "__main__":
             break
         elif key & 0xFF == ord('r'):
             clockwise = -1 * clockwise
+
