@@ -12,6 +12,8 @@ if __name__ == "__main__":
     center = np.array([320,320])
     clockwise = 1
     cv2.namedWindow("test", cv2.WINDOW_NORMAL)
+    counter = 0
+    vel = 0
     while True:
         # Blank frame
         sim_frame = np.zeros((640,640,3))
@@ -29,8 +31,10 @@ if __name__ == "__main__":
                       [ 1                     ,  1                , 1]])
 
         # Velocity of end effector in this case is x:-500,y:0, theta: 0
-        vel = np.dot(np.linalg.inv(J),np.array([-500,0,0]))
+        if counter % 600 == 0:
+            vel = np.dot(np.linalg.inv(J),np.array([-500,0,0]))
 
+        counter = counter + 1
         # Update angular velocity
         new_time = 2*pi/vel
         robot.set_velocity(0, new_time[0])

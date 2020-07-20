@@ -7,7 +7,7 @@ class Scara():
     """ Scara object """
     def __init__(self):
         """ Initialize robot current state """
-        with open('config.json', 'r') as file:
+        with open('/Users/wangchangwen/Git/aiRobots/robot_simulator/3axis_planar_robot/config.json', 'r') as file:
             cfg_dict = json.load(fp=file)
 
             """
